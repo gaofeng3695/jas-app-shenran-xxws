@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+  <div class="_outer-wrapper " v-cloak>
+    <div>
+      <mt-header title="工地跟进任务">
+        <mt-button icon="back" @click.native="closePage" slot="left"></mt-button>
+      </mt-header>
+    </div>
+    <div v-setheight>
+      <div style="height: 100%;overflow: auto;" class="listWrapper">
+        <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" @top-status-change="handleTopChange">
+          <ul>
+            <div class="pt10" style="padding: 10px 10px 0 10px;" v-for="item in list01"
+              v-if="item.eventContactTaskTypeName">
+              <div class="pt10 pb10 pl10 bgfff " @click="gotoDetail(item)" style="border-radius: 8px;">
+                <div style="display: flex;align-items: center;">
+                  <div class="fs16 lh16" style="flex:1;"><span>{{item.eventContactTaskTypeName}}</span></div>
+                  <div class="grey3_clr" :style="{'background':item.ifFinish=='0'?'#ff672d':'#8bc34a'}"
+                    style="color:#fff;height: 20px;line-height:20px;padding: 0 10px;border-radius: 9px 0 0 9px;">
+                    {{item.ifFinish=='0'?'未填写':'已填写'}}
+                  </div>
+                </div>
+                <!--  -->
+                <div style="display: flex;align-items: center;">
+                  <div class="grey3_clr" style="flex:1;">
+                    <div class="lh16">{{formatTime(item.eventContactTaskTypeName)}}</div>
+                  </div>
+                  <div class="grey3_clr lh16 pr10">{{item.modifyUserName}}</div>
+                </div>
+              </div>
+            </div>
+          </ul>
+        </mt-loadmore>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/components/jas-more-searcher.js"></script>
+<script>
+  window.vm = new Vue({
+    el: '._outer-wrapper',
+    data: function () {
+      return {
+        form: {
+          value: ''
+        },
+        timeDesc: {
+          '上午联系': [6, 9],
+          '上午巡查': [6, 12],
+          '中午联系': [6, 13],
+          '下午巡查': [12, 19],
+          '下午联系': [12, 21],
+          '当天联系': [6, 21],
+          '当天巡查': [6, 19],
+        },
+
+        list: [{
+          "safeDistance": "安全保护范围内",
+          "eventContactTaskId": "67563518-3d75-11eb-9b46-002a3a4a5a36",
+          "eventContactTaskTypeName": "上午联系",
+          "tomorrowSafeDistance": null,
+          "eventContactTaskType": "HY_M_C",
+          "ifFinishCn": "已完成",
+          "tomorrowPlanConstructionSituation": null,
+          "modifyUserName": "雷凯",
+          "contactConstructionDesc": "XXXXXXX工地，计划今日于XXXXXXXX路段XXXXXXXXX处施工",
+          "ifFinish": 0,
+          "exploratorySituation": null,
+          "tomorrowContactConstructionDesc": null,
+          "inspectionConstructionDesc": null,
+          "planConstructionSituation": "计划上午施工",
+          "constructionSituation": null,
+          "objectId": "675bbd19-3d75-11eb-9b46-002a3a4a5a36"
+        }],
+        list01: [],
+        topStatus: '',
+
+        pageNo: 1,
+        allLoaded: false,
+      }
+    },
+
+    created: function () {
+
+    },
+    mounted: function () {
+      var that = this;
+      appcan.ready(function () {
+        // that.refresh();
+        appcan.window.on('resume', function () {
+          that.refresh();
+        });
+      });
+    },
+    methods: {
+      formatTime: function (type) {
+        var aTime = this.timeDesc[type];
+        return aTime[0] + ':00' + ' ~ ' + aTime[1] + ':00';
+      },
+      refresh: function () {
+        var that = this;
+        this.pageNo = 1;
+        this.allLoaded = false;
+        this._requestList(true);
+      },
+      loadBottom: function () {
+        if (this.allLoaded) {
+          return;
+        }
+        this._requestList();
+      },
+      _requestList: function (isFresh) {
+        var that = this;
+        that.toastInst && that.toastInst.close();
+        that.$indicator && that.$indicator.open({
+          text: '正在加载数据...',
+          spinnerType: 'fading-circle'
+        });
+        jasTools.ajax.post('cloudlink-inspection-task/contactTask/getInspectionList', {
+          contactTaskId: localStorage.getItem('site_contact_item_oid')
+        }, function (data) {
+          that.$indicator && that.$indicator.close();
+          var _arr = data.rows;
+          if (isFresh) {
+            that.list01 = [].concat(_arr);
+            // alert(JSON.stringify(that.list01, 0, 4))
+            setTimeout(function () {
+              isFresh && ($('.listWrapper')[0].scrollTop = 0);
+            }, 10);
+          } else {
+            that.list01 = that.list01.concat(_arr);
+            if (_arr.length == 0) {
+              this.allLoaded = true;
+              that.toastInst = that.$toast('没有更多数据');
+            } else {
+              that.pageNo++;
+            }
+          }
+          that.$refs.loadmore.onTopLoaded();
+          that.$refs.loadmore.onBottomLoaded();
+        }, function (data) {
+          that.$refs.loadmore.onTopLoaded();
+          that.$refs.loadmore.onBottomLoaded();
+        });
+      },
+      handleTopChange: function (status) {
+        console.log(status)
+        this.topStatus = status;
+      },
+      reset: function () {
+        for (var key in this.form) {
+          this.form[key] = '';
+        }
+      },
+      clear: function () {},
+      closePage: function () {
+        window.appcan && appcan.window.close();
+      },
+      gotoDetail: function (item) {
+        // alert(123)
+        item.timeScope = this.timeDesc[item.eventContactTaskTypeName];
+        localStorage.setItem('site_contact_sub_item', JSON.stringify(item));
+        var url = '../../../pages/module-site-contact/form01/form01.html';
+        appcan.window.open('addPage01', url, 10, 16, 0, 0, 0);
+      },
+    },
+  });
+</script>
+
+</html>

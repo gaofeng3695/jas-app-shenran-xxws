@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport"
+        content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/ui-box.css">
+        <link rel="stylesheet" href="../css/ui-base.css">
+        <link rel="stylesheet" href="../css/ui-color.css">
+        <link rel="stylesheet" href="../css/appcan.icon.css">
+        <link rel="stylesheet" href="../css/appcan.control.css">
+        <link rel="stylesheet" href="src/css/keyPoint.css">
+    </head>
+
+    <body class="um-vp bc-bg" ontouchstart>
+        <div id="app">
+            <div class="clr666 nodata ulev30" v-if="dataArray.length==0">
+            暂无数据
+            </div>
+            <ul class="keypoint_list" id="list_wrapper">
+                <!-- <li class="sectionMargin sectionShadow">
+                    <div class="point_list us1" onclick="enter_list(this);">
+                        <div class="point_title">
+                            <div class="code ulim100">
+                                编号：0909编号：0909编号：0909编号：0909 编号：0909编号：0909编号：0909编号：0909
+                            </div>
+                            <div class="model_status">
+                                <span class="model">一天两巡</span>
+                                <span class="status" >已分配</span>
+                            </div>
+
+                        </div>
+                        <div class="point_main ub-ver">
+                            <div class="line ">
+                                <div class=" wid_hf pointName line ulim100 ufl">
+                                    关键点名称 关键点名称 关键点名称 关键点名称 关键点名称
+                                </div>
+
+                                <div class="wid_hf orgName   line ulim100 tx-r ufr">
+                                    定远输配所定远输配所定远输配所定远输配所定远输配所定远输配所
+                                </div>
+                            </div>
+                            <div class="ub ub-ac">
+                                <div class="ub-f1  ulim100 address">
+                                    北京市朝阳区
+                                </div>
+                                <div class="address_error" >
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </li>  --> 
+                <div v-for="item in dataArray">
+                <point-list :dataobj="item" @changeaddress="changeAddress"></point-list>
+                </div>
+
+
+            </ul>
+            <num-tip :now="dataArray.length" :total="total" :isfooter="false"></num-tip>
+        </div>
+        <script src="../js/vue.min.js"></script>
+        <script src="../js/appcan.js"></script>
+        <script src="../js/appcan.control.js"></script>
+
+        <script src="../common/js/common_base.js"></script>
+        <script src="../common/js/common_database.js"></script>
+        <script src="../common/js/common_tianji.js"></script>
+        <script src="../common/js/common_jasRequest.js"></script>
+        <script src="../common/js/common_bounce.js"></script>
+        <script src="../vue_component/search.component.vue.js"></script>
+        <script src="../vue_component/num_tip.component.vue.js"></script>
+        <script src="src/js/keyPoint.component.js"></script>
+        <script src="src/js/keyPoint.js"></script>
+    </body>
+
+</html>

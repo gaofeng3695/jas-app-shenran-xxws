@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+        <style>
+            [v-cloak] {
+                display: none;
+            }
+        </style>
+    </head>
+    <body class="um-vp bc-bg" style="background: #fff;" >
+
+        <div style="margin: 0em .625em;padding-top: .625em;" id="app">
+            <input-common
+            v-model="form.name"
+            title="名称"
+            placeholder="请填写关键点名称"
+            :required="true"
+            ></input-common>
+            <input-common
+            v-model="form.code"
+            title="编号"
+            placeholder="请填写关键点编号"
+            :required="true"
+            ></input-common>
+            <select-common
+            v-model="modelCode"
+            :valuename="detailInspectionModel"
+            :options="modelOptions"
+            :required="true"
+            placeholder="请选择巡检模式（必选）"
+            title="巡检模式"
+            ></select-common>
+            <input-common
+            v-model="form.effectiveRadius"
+            title="有效半径"
+            placeholder="请填写有效半径"
+            :required="true"
+            ></input-common>
+
+            <input-common
+        
+            v-model="form.groupName"
+        
+            title="分组"
+            :required="true"
+            placeholder="请选择分组（必选）"
+            icon="../../maintenance/src/images/choose.png"
+            @click="selectGroup"
+            ></input-common>
+           
+            <input-common
+            v-model="form.location"           
+            title="位置描述"
+            :required="true"
+            placeholder="请选择关键点位置"
+            icon="../../maintenance/src/images/location.png"
+            iconwidth="1.2em"
+             @click="selectAddress"
+            ></input-common>
+            
+            <textarea-common
+            v-model="form.remark"
+            title="备注"
+            placeholder="请填写备注"
+            ></textarea-common>
+
+        </div>
+
+        <script src="../../js/vue.min.js"></script>
+        <script src="../../js/appcan.js"></script>
+        <script src="../../js/appcan.control.js"></script>
+
+        <script src="../../common/js/common_base.js"></script>
+        <script src="../../common/js/common_jasRequest.js"></script>
+
+        <script src="../../vue_component/input_common.component.vue.js"></script>
+        <script src="../../vue_component/select_common.component.vue.js"></script>
+        <script src="../../vue_component/textarea_common.component.vue.js"></script>
+
+        <script src="../src/js/add_keyPoint.js"></script>
+    </body>
+</html>
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<widget appId="aaaot10026" channelCode="0000" height="480" pid="" sreensize="4.5" version="00.00.0001" viewmode="application" widgetId="" width="320">
+    <name>巡线卫士</name>
+    <description/>
+    <author email=""/>
+    <icon src="icon.png"/>
+    <license href=""/>
+    <content encoding="utf-8" src="route.html"/>
+    <updateurl/>
+    <logserverip/>
+    <showmyspace>false</showmyspace>
+    <obfuscation>false</obfuscation>
+    <globalobfuscation>1</globalobfuscation>
+    <bgcolor>#fefefe</bgcolor>
+    <orientation>1</orientation>
+    <error src=""/>
+    <removeloading/>
+    <debug/>
+    <partobfuscation>false</partobfuscation>
+    <webapp>false</webapp>
+    <config desc="uexBaiduMap" type="KEY">
+        <param name="$uexBaiduMap_APIKey$" platform="android" value="hr3A06Qe4Oz3ULCYYZtqZdfazR6NdR97"/>
+    </config>
+    <config desc="uexQQ" type="KEY">
+        <param name="$UEXQQ_APPID$" platform="android" value="tencent1105846652"/>
+    </config>
+</widget>

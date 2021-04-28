@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+</style>
+
+<body>
+  <div class="_outer-wrapper " v-cloak>
+
+    <div>
+      <jas-header :title="typeName"></jas-header>
+    </div>
+    <div v-setheight>
+      <div class="bgfff pl10 pr10">
+        <jas-detail-header style="background: #fff;" title="基本信息"></jas-detail-header>
+      </div>
+      <div class="">
+        <template v-for="item in oFormConf[typeName]">
+          <jas-select-field v-if="item.type == 'singleselect'" @change="selectChanged(form[item.field],item)"
+            v-model="form[item.field]" :label="item.name" v-required="item.required" :is-search="0"
+            :options="item.options" :disabled="disableField(item)">
+          </jas-select-field>
+          <mt-field v-if="item.type == 'textarea'" v-model="form[item.field]" :disabled="disableField(item)"
+            :label="item.name" type="textarea" :disabled="false" v-required="item.required" :rows="item.rows || '4'"
+            :placeholder="item.placeholder || '请输入'+item.name">
+          </mt-field>
+        </template>
+      </div>
+      <div class="bgfff pl10 pt10 pr10">
+        <jas-detail-header title="图片信息"></jas-detail-header>
+      </div>
+      <div class="bgfff ">
+        <jas-photo-manager ref="myphoto" :required="false" :initfiles="initfiles" :colnumber="4" :isview="0" :max="5"
+          label="上传图片">
+        </jas-photo-manager>
+      </div>
+    </div>
+
+    <jas-more-button-footer @clickbtn="clickbtn" :mainbuttons="mainbuttons" :otherbuttons="['取消返回']">
+    </jas-more-button-footer>
+
+  </div>
+</body>
+
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/components/jas-photo-manager.js"></script>
+<script src="./../../../common/components/jas-file-manager.js"></script>
+<script src="./../../../common/components/jas-video-manager.js"></script>
+<script src="./../../../common/components/jas-voice-manager.js"></script>
+<script src="./../../../common/components/jas-datetime-field.js"></script>
+<script src="./formConfig.js"></script>
+<script>
+  window.vm = new Vue({
+    el: '._outer-wrapper',
+    data: function () {
+      var that = this;
+      return {
+        typeName: '',
+        oFormConf: FormConfig,
+        mainbuttons: [], //['确认提交']
+        form: {},
+        initfiles: [ //
+          // {
+          //   src: '../../../common/images/m1.png',
+          //   fileName: '巡线工名单.xls',
+          //   fileSize: '2.45'
+          // }, {
+          //   src: '../../../common/images/m2.png',
+          //   fileName: '附件名称.txt',
+          //   fileSize: '2.45'
+          // }, {
+          //   src: '../../../common/images/m3.png',
+          //   fileName: '附件2.txt',
+          //   fileSize: '2.45'
+          // }
+        ],
+      }
+    },
+
+    created: function () {
+      var that = this;
+
+      var formObj = localStorage.getItem('site_contact_sub_item') ? JSON.parse(localStorage.getItem(
+        'site_contact_sub_item')) : {};
+      this.typeName = formObj.eventContactTaskTypeName;
+      this.form = this.formatForm(formObj);
+
+      // alert(JSON.stringify(this.form, 0, 4))
+
+      var userBo = localStorage.getItem('userBo');
+      var roleIds = JSON.parse(userBo).roleIds;
+      if (roleIds == 'dfd82f79-f2d3-4be4-9789-7837d54695f9' && this.isTimeAllowed()) {
+        this.mainbuttons = ['确认提交'];
+      }
+    },
+    mounted: function () {
+      var that = this;
+
+      appcan.ready(function () {
+
+        that.$refs.myphoto.requestFile(that.form.objectId);
+
+      });
+
+    },
+    methods: {
+      selectChanged: function (val, item) {
+        if (val == '未联系上') {
+          // alert(JSON.stringify(item, 0, 4))
+          this.form.tomorrowPlanConstructionSituation = '明日未联系上';
+          // this.form.tomorrowPlanConstructionSituation = '明日未联系上';
+        }
+        // alert(JSON.stringify(o, 0, 4))
+      },
+      validateForm: function () {
+        var arr = this.oFormConf[this.typeName];
+        try {
+
+          for (var i = 0; i < arr.length; i++) {
+            if (arr[i].validate && arr[i].validate.max) {
+              if (this.form[arr[i].field].length > arr[i].validate.max) {
+                // alert(132)
+                this.$toast('【' + arr[i].name + '】不得超过' + arr[i].validate.max + '字');
+                return false;
+              }
+            }
+          }
+        } catch (e) {
+          // alert(e)
+        }
+        return true;
+      },
+      disableField: function (item) {
+        var that = this;
+        if (item.options && JSON.stringify(item.options).indexOf('未联系上') > 0 && JSON.stringify(item.options)
+          .indexOf('明日未联系上') == -1) {
+          return false;
+        }
+        if (JSON.stringify(this.form).indexOf('"未联系上"') > 0) {
+          return true;
+        }
+        return false;
+      },
+      formatForm: function (form) {
+        var that = this;
+        this.oFormConf[this.typeName].forEach(function (item) {
+          if (item.defaultVal && !form[item.field]) {
+            form[item.field] = item.defaultVal;
+          }
+        });
+        return form;
+      },
+      isTimeAllowed: function () {
+        var start = this.form.timeScope[0];
+        var end = this.form.timeScope[1];
+        var now = new Date().getHours();
+        if (now >= start && now <= end) {
+          return true;
+        }
+
+      },
+      showError: function () {
+        this.$toast('请输入3-13之间的数值');
+      },
+      setTabWhenScroll: function () {
+        var that = this;
+        var anchorList = ['anchor1', 'anchor2', 'anchor3'];
+        var anchorPstnList = anchorList.map(function (id) {
+          var re = ($('#' + id)[0].offsetTop - $('#' + id).parent()[0].offsetTop);
+          return re;
+        });
+
+        function getindex(arr, num) {
+          var re = 0;
+          var reIndex = 0;
+          arr.forEach(function (item, index) {
+            if (num > item) {
+              if (item > re) {
+                re = item;
+                reIndex = index;
+              }
+            }
+          });
+          return reIndex;
+        }
+        $('.anchorwrap').on('scroll', function (e) {
+          var s = $('.anchorwrap')[0].scrollTop + 15 // 加15为距离优化
+          var index = getindex(anchorPstnList, s);
+          var tab = anchorList[index];
+          (that.selected != tab) && (that.selected = tab);
+          // console.log(tab)
+          // that.$toast(tab + '')
+        })
+      },
+      clickBar: function (id) {
+        // alert(id)
+        var dom = $('#' + id)[0];
+        dom.scrollIntoView && dom.scrollIntoView();
+      },
+      clickbtn: function (name) {
+        var that = this;
+        // console.log(name)
+        this.toastInst && this.toastInst.close();
+        // this.toastInst = this.$toast('您点击了' + name)
+        if (name == '确认提交') {
+          if (this.validateForm()) {
+            that._requestList();
+          }
+        }
+        if (name == '取消返回') {
+          that.closePage();
+        }
+      },
+      closePage: function () {
+        window.appcan && appcan.window.close();
+      },
+      _requestList: function () {
+        var that = this;
+        that.toastInst && that.toastInst.close();
+        that.$indicator && that.$indicator.open({
+          text: '正在加载数据...',
+          spinnerType: 'fading-circle'
+        });
+        // alert(JSON.stringify(that.form, 0, 4))
+        jasTools.ajax.post('cloudlink-inspection-task/contactTask/updateInspection', that.form, function (data) {
+          that.$refs.myphoto.uploadFiles(that.form.objectId, function () {
+            that.$indicator && that.$indicator.close();
+            that.toastInst = that.$toast('操作成功')
+            that.closePage();
+          });
+        }, function (data) {});
+
+      }
+    },
+  });
+</script>
+
+</html>

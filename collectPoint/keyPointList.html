@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../css/ui-box.css">
+        <link rel="stylesheet" href="../css/ui-base.css">
+        <link rel="stylesheet" href="../css/ui-color.css">
+        <link rel="stylesheet" href="../css/appcan.icon.css">
+        <link rel="stylesheet" href="../css/appcan.control.css">
+        <style>
+            .width1000 {
+                width: 1000px;
+            }
+        </style>
+    </head>
+    <body class="um-vp " ontouchstart>
+        <div id="app1" class="up ub ub-ver bc-bg" tabindex="0">
+            <!--header开始-->
+            <header-common icon1="../event_management/index/images/add.png"
+            @click1="clickPlus"
+            title="关键点采集" ></header-common>
+
+            <!-- 计划title begin -->
+            <div class=" sectionShadow">
+
+                <!-- 搜索框 begin -->
+                <search-input v-model="keyword" @dosearch="dosearch" placeholder="搜索名称、编号、位置、输配所、片区、巡检模式"></search-input>
+                <!-- 搜索框 end -->
+
+            </div>
+
+            <div id="content" class="ub-f1 tx-l">
+
+            </div>
+        </div>
+        <script></script>
+        <script src="../js/vue.min.js"></script>
+        <script src="../js/appcan.js"></script>
+        <script src="../js/appcan.control.js"></script>
+        <script src="../common/js/common_database.js"></script>
+        <script src="../common/js/common_base.js"></script>
+        <script src="../common/js/common_jasRequest.js"></script>
+        <script src="../vue_component/header_common.component.vue.js"></script>
+        <script src="../vue_component/search.component.vue.js"></script>
+
+        <script>
+            var vue1 = new Vue({
+                el : "#app1",
+                data : function() {
+                    return {
+                        keyword : "",
+
+                    }
+                },
+                mounted : function() {
+                    var that = this;
+                    appcan.ready(function() {
+                        that.openPopover();
+                        that.bindResumeEvent();
+                    });
+                },
+                methods : {
+                    openPopover : function() {
+                        var titHeight = $('#content').offset().top;
+                        appcan.frame.open("content", "keyPointList_content.html", 0, titHeight);
+                        window.onorientationchange = window.onresize = function() {
+                            appcan.frame.resize("content", 0, titHeight);
+                        };
+                    },
+                    bindResumeEvent : function() {
+                        appcan.window.on('resume', function() {//窗口回到前台时执行回调函数
+                            appcan.locStorage.remove("groupId");
+                            appcan.locStorage.remove("groupName");
+                            appcan.window.evaluatePopoverScript('', 'content', 'vue.requestList()');
+                            //在指定的弹出窗内执行相应的脚本
+                        });
+                    },
+                    dosearch : function() {
+                        var that = this;
+                        // appcan.logs(that.keyword);
+                        appcan.window.evaluatePopoverScript('keypoint', 'content', 'vue.dosearch("' + that.keyword + '")');
+                    },
+                    clickPlus : function() {
+                        appcan.openWinWithUrl('add_keyPoint', 'add_keyPoint/add_keyPoint.html');
+                    }
+                }
+            });
+
+        </script>
+
+    </body>
+
+</html>

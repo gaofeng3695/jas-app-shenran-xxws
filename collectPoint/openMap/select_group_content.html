@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html class="um landscape min-width-240px min-width-320px min-width-480px min-width-768px min-width-1024px">
+
+    <head>
+        <title></title>
+        <meta charset="utf-8">
+        <meta name="viewport"
+        content="target-densitydpi=device-dpi, width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="../../css/fonts/font-awesome.min.css">
+        <link rel="stylesheet" href="../../css/ui-box.css">
+        <link rel="stylesheet" href="../../css/ui-base.css">
+        <link rel="stylesheet" href="../../css/ui-color.css">
+        <link rel="stylesheet" href="../../css/appcan.icon.css">
+        <link rel="stylesheet" href="../../css/appcan.control.css">
+        <link rel="stylesheet" href="../src/css/select_group.css">
+    </head>
+
+    <body class="um-vp " ontouchstart>
+        <div id="page_0">
+
+            <div style="background:#fff">
+                <li :class="['node',node.children?'':'node-leaf']" v-for="node in treeData">
+                    <div v-if="node.children" class="ub   parItem">
+                        <div class="ub-f1 ulev12">
+                            {{node.text}}
+                        </div>
+                        <div :class="['tx-r','marRight',node.sorted?'direct-open':'direct-close']"
+                        @click="node.sorted=!node.sorted">
+
+                        </div>
+                    </div>
+                    <div v-else class="ulev12">
+                        {{node.text}}
+                    </div>
+                    <ul v-if="node.children" v-show="node.sorted">
+                        <li :class="['node',node.children?'':'node-leaf']" v-for="node1 in node.children">
+                            <div v-if="node1.children" class="ub   parItem">
+                                <div class="ub-f1 ulev12">
+                                    {{node1.text}}
+                                </div>
+                                <div :class="['tx-r','direct-close',node1.sorted?'direct-open':'direct-close']"
+                                @click="node1.sorted=!node1.sorted">
+
+                                </div>
+                            </div>
+                            <div v-else class="ulev12">
+                                {{node1.text}}
+                            </div>
+                            <ul v-if="node1.children" v-show="node1.sorted">
+                                <div v-for="item in node1.children" class=" parItem ub ">
+                                    <div class="radiobox">
+                                        <input :id="item.id" type="radio" :data-id="item.id" :data-name="item.text"
+                                        name="group" :value="item.id">
+                                    </div>
+                                    <label class="ub-f1 ulev12" :for="item.id">{{item.text}}</label>
+                                </div>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </div>
+
+        </div>
+        <script src="../../js/vue.min.js"></script>
+        <script src="../../js/appcan.js"></script>
+        <script src="../../js/appcan.control.js"></script>
+        <script src="../../common/js/common_database.js"></script>
+        <script src="../../common/js/common_base.js"></script>
+        <script src="../../common/js/common_jasRequest.js"></script>
+        <script src="../../vue_component/header_common.component.vue.js"></script>
+        <script src="../../vue_component/search.component.vue.js"></script>
+    </body>
+    <script>
+        var vue = new Vue({
+            el : "#page_0",
+            data : function() {
+                return {
+                    treeData : [{
+                        text : "中盈安信",
+                        sorted : true,
+                        children : [{
+                            text : "校招",
+                            sorted : true,
+                            children : [{
+                                text : "校招",
+                                sorted : true,
+                            }]
+                        }]
+                    }]
+
+                }
+            },
+            created : function() {
+
+            },
+            mounted : function() {
+                var that = this;
+                appcan.ready(function() {
+                    that.requestAllGrounp();
+                });
+            },
+            methods : {
+                requestAllGrounp : function() {
+                    var that = this;
+                    var that = this;
+                    var partURL = "cloudlink-inspection-event/regionalGroup/listTree";
+                    baseOperation.londingToast('数据加载中，请稍后...', 99999);
+                    jasRequest.post(partURL, {}, function(oData) {
+                        baseOperation.closeToast();
+                        var userBO = appcan.locStorage.getVal("userBo");
+                        oData.rows[0].text = JSON.parse(userBO).enterpriseName;
+                        that.treeData = oData.rows;
+                        setTimeout(function() {
+                            var groupId = appcan.locStorage.getVal("groupId");
+                            if (groupId) {
+                                appcan.logs(groupId);
+                                $("input[name='group'][value='" + groupId + "']").attr("checked", true);
+                            }
+                        });
+                    });
+                },
+                choose : function() {
+                    var that = this;
+                    var s = $("input[name='group']:checked").attr("data-id");
+                    var name = $("input[name='group']:checked").attr("data-name");
+                    if (s) {
+                        appcan.locStorage.setVal("groupId", s);
+                        appcan.locStorage.setVal("groupName", name);
+                        appcan.window.evaluateScript('select_group', 'vue1.close()');
+                    } else {
+                        baseOperation.alertToast("请选择所属区域下的分组");
+                    }
+                    //调用页面 关闭
+                }
+            }
+        });
+    </script>
+
+</html>

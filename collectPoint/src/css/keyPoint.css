@@ -1,0 +1,99 @@
+.nodata {
+    text-align: center;
+    padding: 10px 0px;
+}
+
+.point_list {
+    background: #FFFFFF;
+    margin-bottom: .625em;
+    padding: 0 .625em;
+}
+
+.point_title {
+    height: 2.125em;
+    border-bottom: 1px solid #ececec;
+    line-height: 2.125em;
+}
+
+.point_title .code {
+    font-weight: normal;
+    font-size: .75em;
+    color: #999;
+    overflow: hidden;
+    width: 50%;
+    display: inline-block;
+    float: left;
+}
+
+.point_title .model_status {
+    width: 50%;
+  
+    float: right;
+}
+
+.point_title .model_status .model {
+    margin-left:.625em;
+    padding: .25em .3em;
+    color: #409eff;
+    background: #ecf5ff;
+    border: 1px solid #b3d8ff;
+    border-radius: 5px;
+    font-size: .75em;
+}
+
+.point_title .model_status .status {
+    display: inline-block;
+    float: right;
+    font-size: .75em;
+}
+
+.point_main {
+    padding: .625em 0;
+}
+
+.line {
+    height: 2.125em;
+    line-height: 2.125em;
+}
+.fl{
+    float:left;
+}
+.fr{
+    float:right;
+    text-align: right;
+}
+.wid_hf{
+    width:50%;
+}
+
+.pointName,
+.orgName{
+    font-size:.8125em;
+    color:#333;
+}
+.address {
+    color: #59b5fc;
+    font-size: .8125em;
+    padding-left: 1.2em;
+    line-height: 1.0625em;
+    height:1.0625em;
+    background: url("../../../event_management/index/images/mapL.png") no-repeat center left;
+    background-size: auto 100%;
+    box-sizing: border-box;
+}
+.colred{
+   color:red; 
+}
+.colbule{
+   color:#51b7ff; 
+}
+.address_error{
+    width:3em;
+  font-size: .8125em;
+    padding-left: 1em;
+    line-height: 1.0625em;
+    height:1.0625em;
+    background: url("errMap.png") no-repeat center center;
+    background-size: auto 100%;
+    box-sizing: border-box;   
+}

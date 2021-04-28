@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="./../../../lib/mint-ui/style.css">
+  <link rel="stylesheet" href="./../../../lib/font-awesome-4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./../../../common/css/jas-main.css">
+</head>
+<style>
+  .doneBg {
+    background: #fff url(../images/pass.png) no-repeat right 35px bottom -18px !important;
+    background-size: 67px 67px !important;
+  }
+</style>
+
+<body>
+  <div class="_outer-wrapper " v-cloak>
+
+    <div>
+      <mt-header title="工地跟进">
+        <mt-button icon="back" @click.native="closePage" slot="left"></mt-button>
+      </mt-header>
+    </div>
+
+    <div class="shadow-b" style="position: relative;z-index: 8;">
+      <jas-more-searcher v-model="form.value" placeholder="任务号、地址、工地状态、上报人" :ismore="true" :isbtn="true"
+        @search="searchList" @clear="clear" @reset="reset">
+        <template>
+          <jas-select-field label="工地状态" :is-show-clear="1" :is-search="false" :options="gdTypeOptn"
+            v-model="form.gdType">
+          </jas-select-field>
+          <jas-select-field v-for="item in formatItems(form.gdType)" :label="item.name" :is-show-clear="1"
+            :is-search="false" :options="item.options" v-model="form[item.typeVal]">
+          </jas-select-field>
+        </template>
+        <div slot="tip" class="fs10 grey5_clr lh16 bgfff pr12 pl12 line1">
+          已搜索出{{list01.length}}条数据
+        </div>
+      </jas-more-searcher>
+    </div>
+    <div v-setheight>
+      <div style="height: 100%;overflow: auto;transition: 0.3s;" class="listWrapper">
+        <mt-loadmore ref="loadmore" :top-method="refresh" :auto-fill="false" :bottom-method="loadBottom"
+          :bottom-all-loaded="allLoaded" @top-status-change="handleTopChange">
+          <ul>
+            <div class="pt10 of-h" style="padding: 10px 0 0;position: relative;" v-for="item in list01">
+              <div class=" bgfff " :class="isDown(item)?'doneBg':''">
+                <div style="display: flex;align-items: center;" class="bottomLine pl10 pt6 pb6">
+                  <div class="fs12 grey3_clr" style="flex:1;"><span>{{item.eventTaskCode}}</span></div>
+                  <div class="fs12 grey3_clr line1 lh16 pr10 ta-c" style="width: 120px;height:16px;overflow: hidden;">
+                    {{item.eventReportUserName}}</div>
+                  <div class="clrfff fs12" :style="{'background':item.eventStateCn=='活跃工地'?'#ffc107':'#00cc66'}"
+                    style="height: 16px;line-height:16px;padding: 0 6px 0 10px;border-radius: 9px 0 0 9px;">
+                    {{item.eventStateCn}}
+                  </div>
+                </div>
+                <!--  -->
+                <div style="display: flex;align-items: center;" class="pt6 pb6 pl10 pr10">
+                  <div style="flex:1;" @click="gotoDetail(item)">
+                    <div class="lh16 line1">{{item.fullTypeName}}</div>
+                    <div class="lh16 line2">{{item.eventDescription}}</div>
+                    <div class="grey3_clr" style="display: flex;align-items: center;">
+                      <div class="lh16 line1 fs12" style="color:#78cdff;flex:1;">
+                        <i class="fa fa-map-marker fs12 " aria-hidden="true"></i>
+                        {{item.eventAddress}}
+                      </div>
+                      <div class="lh12 pl10">{{(item.taskProgress || 0) + '/' +  (item.eventStateCn=='活跃工地'?'5':'2')}}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-show="list01.length == 0" style="text-align: center;padding-top: 40px;">暂无数据</div>
+          </ul>
+        </mt-loadmore>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+<script src="./../../../appcan/js/appcan.js"></script>
+<script src="./../../../lib/vue/vue.js"></script>
+<script src="./../../../lib/mint-ui/index.js"></script>
+<script src="./../../../common/js/jas-tools.js"></script>
+<script src="./../../../common/components/jas-components.js"></script>
+<script src="./../../../common/components/jas-more-searcher.js"></script>
+<script>
+  window.vm = new Vue({
+    el: '._outer-wrapper',
+    data: function () {
+      return {
+        list: [{
+          "eventAddress": "北京市海淀区西小口路北京市海淀区西小口路北京市海淀区西小口路北京市海淀区西小口路",
+          "eventDescription": "北京市海淀区西小口路北京市海淀区西小口路北京市海淀区西小口路北京市海淀区西小口路",
+          "eventReportUserId": "ec821e50-8d07-4f0e-8ab6-dd1073262dc1",
+          "eventContactTaskType": "每日一次",
+          "eventStateCn": "活跃工地",
+          "eventContactTaskPublishDate": "2020-12-14",
+          "eventCode": "2020051111295538",
+          "eventTaskCode": "RW2020051111295538",
+          "eventState": "20",
+          "eventReportTime": "2020-05-11",
+          "ifFinished": 1,
+          "eventReportUserName": "巡线卫士技术支持-张鹏飞",
+          "enterpriseId": "b4f85a9c-4924-46aa-b7f9-59a8daf40386",
+          "taskProgress": 5,
+          "objectId": "67563518-3d75-11eb-9b46-002a3a4a5a36"
+        }, {
+          "eventAddress": "北京市海淀区西小口路",
+          "eventDescription": "北京市海淀区西小口路",
+          "eventReportUserId": "ec821e50-8d07-4f0e-8ab6-dd1073262dc1",
+          "eventContactTaskType": "每日一次",
+          "eventStateCn": "稳定工地",
+          "eventContactTaskPublishDate": "2020-12-14",
+          "eventCode": "20200421144653758",
+          "eventTaskCode": "RW20200421144653758",
+          "eventState": "20",
+          "eventReportTime": "2020-04-21",
+          "ifFinished": 0,
+          "eventReportUserName": "巡线卫士技术支持-张鹏飞",
+          "enterpriseId": "b4f85a9c-4924-46aa-b7f9-59a8daf40386",
+          "taskProgress": 0,
+          "objectId": "67537b32-3d75-11eb-9b46-002a3a4a5a36"
+        }],
+        list01: [],
+        formItems: [],
+        allformItems: [ //
+          {
+            name: '上午联系情况',
+            showValue: '活跃工地',
+            typeVal: 'HY_M_C',
+            options: [{
+              label: '上午联系未填写',
+              value: '未填写',
+            }, {
+              label: '计划上午施工',
+              value: '计划上午施工',
+            }, {
+              label: '计划上午停工',
+              value: '计划上午停工',
+            }, {
+              label: '上午未联系上',
+              value: '未联系上',
+            }],
+          },
+          {
+            name: '上午巡查情况',
+            showValue: '活跃工地',
+            typeVal: 'HY_M_I',
+            options: [{
+              label: '上午巡查未填写',
+              value: '未填写',
+            }, {
+              label: '上午施工',
+              value: '施工',
+            }, {
+              label: '上午未施工',
+              value: '未施工',
+            }],
+          },
+          {
+            name: '中午联系情况',
+            showValue: '活跃工地',
+            typeVal: 'HY_N_C',
+            options: [{
+              label: '中午联系未填写',
+              value: '未填写',
+            }, {
+              label: '计划下午施工',
+              value: '计划下午施工',
+            }, {
+              label: '计划下午停工',
+              value: '计划下午停工',
+            }, {
+              label: '下午未联系上',
+              value: '未联系上',
+            }],
+          },
+          {
+            name: '下午巡查情况',
+            showValue: '活跃工地',
+            typeVal: 'HY_A_I',
+            options: [{
+              label: '下午巡查未填写',
+              value: '未填写',
+            }, {
+              label: '下午施工',
+              value: '施工',
+            }, {
+              label: '下午未施工',
+              value: '未施工',
+            }],
+          },
+          {
+            name: '下午联系情况',
+            showValue: '活跃工地',
+            typeVal: 'HY_A_C',
+            options: [{
+              label: '下午联系未填写',
+              value: '未填写',
+            }, {
+              label: '计划晚上施工',
+              value: '计划晚上施工',
+            }, {
+              label: '计划晚上停工',
+              value: '计划晚上停工',
+            }, {
+              label: '晚上未联系上',
+              value: '未联系上',
+            }],
+          },
+          {
+            name: '当天联系情况',
+            showValue: '稳定工地',
+            typeVal: 'WD_C_C',
+            options: [{
+              label: '当天联系未填写',
+              value: '未填写',
+            }, {
+              label: '计划上午施工',
+              value: '计划上午施工',
+            }, {
+              label: '计划下午施工',
+              value: '计划下午施工',
+            }, {
+              label: '计划晚上施工',
+              value: '计划晚上施工',
+            }, {
+              label: '计划当日停工',
+              value: '计划当日停工',
+            }, {
+              label: '当日未联系上',
+              value: '未联系上',
+            }],
+          },
+          {
+            name: '当天巡查情况',
+            showValue: '稳定工地',
+            typeVal: 'WD_C_I',
+            options: [{
+              label: '当天巡查未填写',
+              value: '未填写',
+            }, {
+              label: '当天施工',
+              value: '施工',
+            }, {
+              label: '当天未施工',
+              value: '未施工',
+            }],
+          },
+        ],
+        gdTypeOptn: [{
+          label: '活跃工地',
+          value: '活跃工地',
+        }, {
+          label: '稳定工地',
+          value: '稳定工地',
+        }],
+        topStatus: '',
+        form: {
+          value: '',
+          gdType: '',
+          HY_M_C: '',
+          HY_M_I: '',
+          HY_N_C: '',
+          HY_A_I: '',
+          HY_A_C: '',
+          WD_C_C: '',
+          WD_C_I: '',
+        },
+        pageNo: 1,
+        allLoaded: false,
+      }
+    },
+
+    created: function () {
+      // this.list01 = this.list;
+    },
+    mounted: function () {
+      var that = this;
+      appcan.ready(function () {
+        // that.refresh()
+        appcan.window.on('resume', function () {
+          that.refresh();
+        });
+      });
+    },
+    methods: {
+      formatItems: function (gdtype) {
+        return this.allformItems.filter(function (item) {
+          return item.showValue == gdtype;
+        })
+      },
+      formatForm: function () {
+        var that = this;
+        var map = {
+          '稳定工地': ['WD_C_C', 'WD_C_I'],
+          '活跃工地': ['HY_M_C', 'HY_M_I', 'HY_N_C', 'HY_A_I', 'HY_A_C'],
+        };
+        this.form.inspectionList = [];
+        map[this.form.gdType] && map[this.form.gdType].forEach(function (item) {
+          if (that.form[item]) {
+            that.form.inspectionList.push({
+              eventContactTaskType: item,
+              constructionSituation: that.form[item],
+            })
+          }
+        });
+      },
+      isDown: function (item) {
+        var that = this;
+        return (item.taskProgress || 0) == (item.eventStateCn == '活跃工地' ? '5' : '2');
+      },
+      reset: function () {
+        for (var key in this.form) {
+          this.form[key] = '';
+        }
+      },
+      clear: function () {},
+      refresh: function () {
+        var that = this;
+        this.pageNo = 1;
+        this.allLoaded = false;
+        this._requestList(true);
+      },
+      loadBottom: function () {
+        if (this.allLoaded) {
+          return;
+        }
+        this._requestList();
+      },
+      _requestList: function (isFresh) {
+        var that = this;
+        that.toastInst && that.toastInst.close();
+        that.$indicator && that.$indicator.open({
+          text: '正在加载数据...',
+          spinnerType: 'fading-circle'
+        });
+        var stateMap = {
+          '稳定工地': '31',
+          '活跃工地': '20',
+        };
+        jasTools.ajax.post('cloudlink-inspection-task/contactTask/getPageList', {
+          "pageSize": 10,
+          "pageNum": that.pageNo,
+          "keyWord": that.form.value || '',
+          "eventState": stateMap[that.form.gdType] || '',
+          "inspectionList": that.form.inspectionList,
+        }, function (data) {
+          that.$indicator && that.$indicator.close();
+          var _arr = data.rows;
+
+          if (isFresh) {
+            that.list01 = [].concat(_arr);
+            that.pageNo++;
+            setTimeout(function () {
+              isFresh && ($('.listWrapper')[0].scrollTop = 0);
+            }, 10);
+          } else {
+            that.list01 = that.list01.concat(_arr);
+            if (_arr.length == 0) {
+              this.allLoaded = true;
+              that.toastInst = that.$toast('没有更多数据');
+            } else {
+              that.pageNo++;
+            }
+          }
+          that.$refs.loadmore.onTopLoaded();
+          that.$refs.loadmore.onBottomLoaded();
+        }, function (data) {
+          that.$refs.loadmore.onTopLoaded();
+          that.$refs.loadmore.onBottomLoaded();
+        });
+      },
+      handleTopChange: function (status) {
+        console.log(status)
+        this.topStatus = status;
+
+      },
+      closePage: function () {
+        window.appcan && appcan.window.close();
+      },
+      searchList: function (name) {
+        var that = this;
+        // this.$toast('您点击了' + '搜索');
+        that.formatForm();
+        that.refresh()
+      },
+      gotoDetail: function (item) {
+        // alert(JSON.stringify(item, 0, 4))
+        var url = '../../../pages/module-site-contact/list02/list02.html';
+        localStorage.setItem('site_contact_item_oid', item.objectId);
+        appcan.window.open('listPage02', url, 10, 16, 0, 0, 0);
+      },
+    },
+  });
+</script>
+
+</html>
